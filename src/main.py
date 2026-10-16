@@ -3,7 +3,8 @@ import re
 from pathlib import Path
 
 REQUIRED_COLUMNS = {"id", "source_text", "translated_text"}
-CSV_PATH = Path(__file__).parent / "data" / "input" / "translations.csv"
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+INPUT_PATH = PROJECT_ROOT / "data" / "input" / "translations.csv"
 
 
 def read_translations(path):
@@ -88,8 +89,8 @@ def find_empty_text_issues(translations):
     return issues
 
 
-def find_missing_placeholder_issues(translations):
-    """Return issues for placeholders found in source but absent from translation."""
+def find_placeholder_issues(translations):
+    """Return issues for placeholders found in one language but absent in the other."""
     issues = []
     for row in translations:
         source_placeholders = set(re.findall(r"\{[^{}]+\}", row["source_text"]))
@@ -124,18 +125,22 @@ def find_missing_placeholder_issues(translations):
     return issues
 
 
+def main():
+    translations = read_translations(INPUT_PATH)
+    print(f"Read {len(translations)} translation record(s):")
+    for row in translations:
+        print(row)
+
+    issues = find_empty_text_issues(translations)
+    issues.extend(find_placeholder_issues(translations))
+    print(f"Found {len(issues)} issue(s):")
+    for issue in issues:
+        print(issue)
+
+
 if __name__ == "__main__":
     try:
-        rows = read_translations(CSV_PATH)
-        print(f"Read {len(rows)} translation record(s):")
-        for row in rows:
-            print(row)
-
-        issues = find_empty_text_issues(rows)
-        issues.extend(find_missing_placeholder_issues(rows))
-        print(f"Found {len(issues)} issue(s):")
-        for issue in issues:
-            print(issue)
+        main()
 
     except (FileNotFoundError, ValueError) as error:
         print(f"Error: {error}")
