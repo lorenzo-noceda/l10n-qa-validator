@@ -1,0 +1,17 @@
+# Local Python environment
+.venv/
+
+# Python-generated files
+__pycache__/
+*.py[cod]
+
+# Test and tool caches
+.pytest_cache/
+
+# Generated report
+data/output/report.csv
+
+# Local environment variables or secrets
+.env
+.env.*
+!.env.example
